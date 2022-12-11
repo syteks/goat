@@ -1,5 +1,11 @@
 package reddit
 
+import (
+	"encoding/json"
+	"goat/packages/handlers/custom_error"
+	"strings"
+)
+
 // Post contains the information about a poss of a subreddit.
 type Post struct {
 	SubredditName         string             `json:"subreddit"`
@@ -66,6 +72,7 @@ type MediaResolutions struct {
 	Height int    `json:"height"`
 }
 
+// ApiPostData is the structure representing the posts of a subreddit.
 type ApiPostData struct {
 	After     interface{}       `json:"after"`
 	Dist      int               `json:"dist"`
@@ -75,11 +82,14 @@ type ApiPostData struct {
 	Before    interface{}       `json:"before"`
 }
 
+// ApiPostChildren are the individual post of list of posts from the subreddit.
 type ApiPostChildren struct {
 	Kind string              `json:"kind"`
 	Data ApiPostChildrenData `json:"data"`
 }
 
+// ApiPostChildrenData is the structure that will contain the post's information of a subreddit posts list.
+// Take in consideration that the type interface are put to the keys that are not currently being used.
 type ApiPostChildrenData struct {
 	ApprovedAtUtc              interface{}   `json:"approved_at_utc"`
 	Subreddit                  string        `json:"subreddit"`
@@ -213,4 +223,68 @@ type RedditVideo struct {
 type ApiPostResponse struct {
 	Kind string      `json:"kind"`
 	Data ApiPostData `json:"data"`
+}
+
+// GetPosts all the posts from the subreddit matching the endpoint.
+func GetPosts(endpoint string) ([]Post, error) {
+	// The params used to filter the reddit API response.
+	params := make(map[string]string)
+
+	params["limit"] = "100"
+
+	body := get(endpoint, params)
+
+	var apiPostResponse ApiPostResponse
+
+	err := json.Unmarshal(body, &apiPostResponse)
+
+	custom_error.Handle(err, "There was an error un-parsing the JSON data.")
+
+	var posts []Post
+
+	if err != nil {
+		return posts, err
+	}
+
+	// Append every post fetched from reddit to an array with a readable post structure.
+	for _, post := range apiPostResponse.Data.Children {
+		// Continue if our post doesn't have an image.
+		if len(post.Data.Preview.Images) == 0 {
+			continue
+		}
+
+		videoSource := post.Data.Preview.Images[0].Variants.Mp4
+
+		// If the post is a video and the original source is missing, it means it is in the media json key.
+		if post.Data.IsVideo && len(strings.TrimSpace(videoSource.Source.Url)) == 0 {
+			videoSource = Video{
+				Source: MediaSource{
+					Url:    post.Data.Media.RedditVideo.FallbackUrl,
+					Width:  0,
+					Height: 0,
+				},
+			}
+		}
+
+		posts = append(posts, Post{
+			post.Data.Subreddit,
+			post.Data.SubredditNamePrefixed,
+			post.Data.SubredditType,
+			post.Data.Title,
+			post.Data.Hidden,
+			post.Data.Edited,
+			post.Data.UrlOverriddenByDest,
+			post.Data.Author,
+			post.Data.Permalink,
+			post.Data.Url,
+			post.Data.IsVideo,
+			post.Data.Preview.Images[0].Id,
+			post.Data.Preview.Images[0].Source,
+			post.Data.Preview.Images[0].Resolutions,
+			post.Data.Preview.Images[0].Variants.Gif,
+			videoSource,
+		})
+	}
+
+	return posts, err
 }

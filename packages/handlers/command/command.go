@@ -7,8 +7,9 @@ import (
 	"strings"
 )
 
+// All the available command that the bot is going to have access to.
 var availableCommands = map[string]func(session *discordgo.Session, message *discordgo.MessageCreate, parameters []string){
-	"reddit": reddit.GetMeme,
+	"reddit": reddit.GetSubreddit,
 }
 
 // Handle it will handle the commands called by the user.
