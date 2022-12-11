@@ -92,11 +92,11 @@ func get(endpoint string, params map[string]string) []byte {
 	return body
 }
 
+// GetSubredditPosts gets all the subreddit's posts associated with the given subreddit name.
 func GetSubredditPosts(subredditName string, subredditType string) ([]Post, error) {
 	if time.Now().After(Auth.ExpiringDate) {
 		AuthorizeUsingDefaultCredentials()
 	}
-
 	defaultSubreddit := "r"
 
 	if subredditType == "" {
@@ -105,61 +105,5 @@ func GetSubredditPosts(subredditName string, subredditType string) ([]Post, erro
 
 	endpoint := EndpointSubreddit + "/" + subredditType + "/" + subredditName
 
-	params := make(map[string]string)
-
-	params["limit"] = "100"
-
-	body := get(endpoint, params)
-
-	var apiPostResponse ApiPostResponse
-
-	err := json.Unmarshal(body, &apiPostResponse)
-
-	custom_error.Handle(err, "There was an error un-parsing the JSON data.")
-
-	var posts []Post
-
-	if err != nil {
-		return posts, err
-	}
-
-	for _, post := range apiPostResponse.Data.Children {
-		// Continue if our post doesn't have an image.
-		if len(post.Data.Preview.Images) == 0 {
-			continue
-		}
-
-		videoSource := post.Data.Preview.Images[0].Variants.Mp4
-
-		if post.Data.IsVideo && len(strings.TrimSpace(videoSource.Source.Url)) == 0 {
-			videoSource = Video{
-				Source: MediaSource{
-					Url:    post.Data.Media.RedditVideo.FallbackUrl,
-					Width:  0,
-					Height: 0,
-				},
-			}
-		}
-
-		posts = append(posts, Post{
-			post.Data.Subreddit,
-			post.Data.SubredditNamePrefixed,
-			post.Data.SubredditType,
-			post.Data.Title,
-			post.Data.Hidden,
-			post.Data.Edited,
-			post.Data.UrlOverriddenByDest,
-			post.Data.Author,
-			post.Data.Permalink,
-			post.Data.Url,
-			post.Data.IsVideo,
-			post.Data.Preview.Images[0].Id,
-			post.Data.Preview.Images[0].Source,
-			post.Data.Preview.Images[0].Resolutions,
-			post.Data.Preview.Images[0].Variants.Gif,
-			videoSource,
-		})
-	}
-
-	return posts, err
+	return GetPosts(endpoint)
 }

@@ -23,6 +23,7 @@ type AuthResponse struct {
 	ExpiringDate time.Time
 }
 
+// Auth The variable necessary for reddit authentication API.
 var (
 	Auth AuthResponse
 )
