@@ -226,7 +226,7 @@ type ApiPostResponse struct {
 }
 
 // GetPosts all the posts from the subreddit matching the endpoint.
-func GetPosts(endpoint string) ([]Post, error) {
+func GetPosts(endpoint string, notSafeForWork bool) ([]Post, error) {
 	// The params used to filter the reddit API response.
 	params := make(map[string]string)
 
@@ -248,6 +248,11 @@ func GetPosts(endpoint string) ([]Post, error) {
 
 	// Append every post fetched from reddit to an array with a readable post structure.
 	for _, post := range apiPostResponse.Data.Children {
+		// If we want only safe for work posts we have to skip those posts that are not safe for work.
+		if !notSafeForWork && post.Data.Over18 {
+			continue
+		}
+
 		// Continue if our post doesn't have an image.
 		if len(post.Data.Preview.Images) == 0 {
 			continue

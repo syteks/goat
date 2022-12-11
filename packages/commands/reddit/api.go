@@ -93,17 +93,12 @@ func get(endpoint string, params map[string]string) []byte {
 }
 
 // GetSubredditPosts gets all the subreddit's posts associated with the given subreddit name.
-func GetSubredditPosts(subredditName string, subredditType string) ([]Post, error) {
+func GetSubredditPosts(subredditName string, subredditType string, notSafeForWork bool) ([]Post, error) {
 	if time.Now().After(Auth.ExpiringDate) {
 		AuthorizeUsingDefaultCredentials()
-	}
-	defaultSubreddit := "r"
-
-	if subredditType == "" {
-		subredditType = defaultSubreddit
 	}
 
 	endpoint := EndpointSubreddit + "/" + subredditType + "/" + subredditName
 
-	return GetPosts(endpoint)
+	return GetPosts(endpoint, notSafeForWork)
 }

@@ -25,22 +25,36 @@ func GetSubreddit(session *discordgo.Session, message *discordgo.MessageCreate, 
 		}
 	}
 
+	channel, err := session.Channel(message.ChannelID)
+
+	custom_error.Handle(err, "There was an error fetching the Channel information.")
+
+	// If there was an error fetching the channel it means
+	if err != nil {
+		return
+	}
+
 	// Gets random memes from the subreddit '/r/memes'.
-	posts, err := GetSubredditPosts(subredditName+"/rising", subredditType)
+	posts, err := GetSubredditPosts(subredditName+"/rising", subredditType, channel.NSFW)
 
 	// If there is an error fetching the posts from the subreddit, send a message to the user.
 	if err != nil {
-		_, _ = session.ChannelMessageSend("Could not find the subreddit", message.ChannelID)
+		_, _ = session.ChannelMessageSend(message.ChannelID, "Could not find the subreddit")
 		return
 	}
 
 	// If no posts is found in the subreddit.
-	if len(posts) <= 0 {
+	if len(posts) == 0 {
+		_, _ = session.ChannelMessageSend(message.ChannelID, "No posts found respecting the channel's age restriction and the given subreddit name.")
 		return
 	}
 
-	// Get a random post from the fetched posts.
-	randNumber := rand.Intn(len(posts)-1) + 1
+	randNumber := 0
+
+	if len(posts) > 1 {
+		// Get a random post from the fetched posts.
+		randNumber = rand.Intn(len(posts)-1) + 1
+	}
 
 	post := posts[randNumber]
 
