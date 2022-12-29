@@ -1,6 +1,7 @@
 package reddit
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goat/packages/handlers/custom_error"
 	"math/rand"
@@ -57,14 +58,22 @@ func GetSubreddit(session *discordgo.Session, message *discordgo.MessageCreate, 
 	}
 
 	post := posts[randNumber]
+	source := post.Url
 
 	if post.IsVideo {
-		_, err := session.ChannelMessageSend(message.ChannelID, post.Mp4.Source.Url)
-
-		custom_error.Handle(err, "Failed to send the reddit meme video.")
-	} else {
-		_, err := session.ChannelMessageSend(message.ChannelID, post.Url)
-
-		custom_error.Handle(err, "Failed to send the reddit meme images.")
+		source = post.Mp4.Source.Url
 	}
+
+	if post.NSFW {
+		source = fmt.Sprintf("|| %s ||", source)
+	}
+
+	sendSubredditPost(session, channel, source)
+}
+
+// sendSubredditPost sends the content of a subreddit post, if the channel is marked as NSFW we need to mark the image or vide URL as spoiler.
+func sendSubredditPost(session *discordgo.Session, channel *discordgo.Channel, postUrl string) {
+	_, err := session.ChannelMessageSend(channel.ID, postUrl)
+
+	custom_error.Handle(err, "Failed to post the subreddit post content to the channel.")
 }
