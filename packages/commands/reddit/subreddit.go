@@ -19,6 +19,7 @@ type Post struct {
 	Permalink             string             `json:"permalink"`
 	Url                   string             `json:"url"`
 	IsVideo               bool               `json:"is_video"`
+	NSFW                  bool               `json:"over_18"`
 	MediaId               string             `json:"id"`
 	Source                MediaSource        `json:"source"`
 	Resolutions           []MediaResolutions `json:"resolutions"`
@@ -283,6 +284,7 @@ func GetPosts(endpoint string, notSafeForWork bool) ([]Post, error) {
 			post.Data.Permalink,
 			post.Data.Url,
 			post.Data.IsVideo,
+			post.Data.Over18,
 			post.Data.Preview.Images[0].Id,
 			post.Data.Preview.Images[0].Source,
 			post.Data.Preview.Images[0].Resolutions,

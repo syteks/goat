@@ -64,17 +64,16 @@ func GetSubreddit(session *discordgo.Session, message *discordgo.MessageCreate, 
 		source = post.Mp4.Source.Url
 	}
 
+	if post.NSFW {
+		source = fmt.Sprintf("|| %s ||", source)
+	}
+
 	sendSubredditPost(session, channel, source)
 }
 
 // sendSubredditPost sends the content of a subreddit post, if the channel is marked as NSFW we need to mark the image or vide URL as spoiler.
 func sendSubredditPost(session *discordgo.Session, channel *discordgo.Channel, postUrl string) {
-	if channel.NSFW {
-		postUrl = fmt.Sprintf("|| %s ||", postUrl)
-	}
-
 	_, err := session.ChannelMessageSend(channel.ID, postUrl)
 
 	custom_error.Handle(err, "Failed to post the subreddit post content to the channel.")
-
 }
