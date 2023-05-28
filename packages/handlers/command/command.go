@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"goat/packages/commands/jukebox"
 	"goat/packages/commands/reddit"
 	"os"
 	"strings"
@@ -9,7 +10,8 @@ import (
 
 // All the available command that the bot is going to have access to.
 var availableCommands = map[string]func(session *discordgo.Session, message *discordgo.MessageCreate, parameters []string){
-	"reddit": reddit.GetSubreddit,
+	"reddit":  reddit.GetSubreddit,
+	"jukebox": jukebox.Play,
 }
 
 // Handle it will handle the commands called by the user.
