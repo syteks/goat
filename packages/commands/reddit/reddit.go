@@ -2,9 +2,10 @@ package reddit
 
 import (
 	"fmt"
+	"math/rand"
+
 	"github.com/bwmarrin/discordgo"
 	"goat/packages/handlers/custom_error"
-	"math/rand"
 )
 
 // GetSubreddit gets a subreddit post and displays it.

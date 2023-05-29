@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 	"goat/packages/handlers/command"
 	"goat/packages/handlers/custom_error"
-	"log"
-	"os"
 )
 
 // main is the start of our discord bot life.

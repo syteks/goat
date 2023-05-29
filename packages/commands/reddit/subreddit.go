@@ -2,8 +2,9 @@ package reddit
 
 import (
 	"encoding/json"
-	"goat/packages/handlers/custom_error"
 	"strings"
+
+	"goat/packages/handlers/custom_error"
 )
 
 // Post contains the information about a poss of a subreddit.

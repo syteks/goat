@@ -1,10 +1,11 @@
 package command
 
 import (
-	"github.com/bwmarrin/discordgo"
-	"goat/packages/commands/reddit"
 	"os"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"goat/packages/commands/reddit"
 )
 
 // All the available command that the bot is going to have access to.
