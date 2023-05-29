@@ -3,13 +3,14 @@ package reddit
 import (
 	"encoding/json"
 	"fmt"
-	"goat/packages/handlers/custom_error"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"goat/packages/handlers/custom_error"
 )
 
 // AuthorizeUsingDefaultCredentials authorize the use of reddit API using the default credentials found in the .env file.
